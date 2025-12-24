@@ -357,6 +357,25 @@ class DeviceSpec(object):
 # the IDs for the supported devices
 # Each ID maps a device name to a DeviceSpec object
 device_specs = {
+    "SpaceMouse Wireless BT": DeviceSpec(
+        name="SpaceMouse Wireless BT",
+        hid_id=[0x256F, 0xC63A],  
+        # hid_id=[0x256F, 0xC652],  
+        led_id=[0x8, 0x4B],
+        mappings={
+            "x": AxisSpec(channel=1, byte1=1, byte2=2, scale=1),
+            "y": AxisSpec(channel=1, byte1=3, byte2=4, scale=-1),
+            "z": AxisSpec(channel=1, byte1=5, byte2=6, scale=-1),
+            "pitch": AxisSpec(channel=1, byte1=7, byte2=8, scale=-1),
+            "roll": AxisSpec(channel=1, byte1=9, byte2=10, scale=-1),
+            "yaw": AxisSpec(channel=1, byte1=11, byte2=12, scale=1),
+        },
+        button_mapping=[
+            ButtonSpec(channel=3, byte=1, bit=0),  # 按钮1
+            ButtonSpec(channel=3, byte=1, bit=1),  # 按钮2
+        ],
+        axis_scale=350.0,
+    ),
     "SpaceExplorer": DeviceSpec(
         name="SpaceExplorer",
         # vendor ID and product ID
@@ -1045,8 +1064,17 @@ if __name__ == "__main__":
         ButtonCallback([2, 3], butt_2_3),
     ]
 
-    dev = open(dof_callback=print_state, button_callback=print_buttons, button_callback_arr=button_callbacks_arr)
-
+    # dev = open(
+    #     dof_callback=print_state, 
+    #     button_callback=print_buttons, 
+    #     button_callback_arr=button_callbacks_arr
+    # )
+    dev = open(
+        device="SpaceMouse Wireless BT",
+        path="/dev/hidraw2",  # 直接指定路径
+        dof_callback=print_state,
+        button_callback=print_buttons
+        # button_callback_arr=button_callbacks_arr
+    )
     while True:
         state = dev.read()
-
