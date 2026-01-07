@@ -1,0 +1,42 @@
+# Python编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyc
+
+# 包构建文件
+*.egg-info/
+build/
+dist/
+
+# 环境文件
+.env
+.venv
+env/
+venv/
+
+# 日志和数据文件
+*.log
+logs/
+*.pkl
+*.pickle
+
+# 检查点和模型文件
+checkpoints/
+models/
+*.ckpt
+
+# 临时文件
+*.tmp
+*.temp
+.DS_Store
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+
+# 训练过程文件
+wandb/
+*.mp4
