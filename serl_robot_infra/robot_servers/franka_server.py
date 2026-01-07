@@ -32,7 +32,8 @@ flags.DEFINE_list(
     "Target joint angles for the robot to reset to",
 )
 flags.DEFINE_string("flask_url", 
-    "127.0.0.1",
+    # "127.0.0.1",
+    "0.0.0.0",
     "URL for the flask server to run on."
 )
 flags.DEFINE_string("ros_port", "11311", "Port for the ROS master to run on.")
