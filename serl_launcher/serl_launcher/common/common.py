@@ -22,7 +22,7 @@ def shard_batch(batch, sharding):
         batch: A pytree of arrays.
         sharding: A jax Sharding object with shape (num_devices,).
     """
-    return jax.tree_map(
+    return jax.tree.map(
         lambda x: jax.device_put(
             x, sharding.reshape(sharding.shape[0], *((1,) * (x.ndim - 1)))
         ),
@@ -115,8 +115,8 @@ class JaxRLTrainState(struct.PyTreeNode):
     epsilon: float = 0.0
 
     @staticmethod
-    def _tx_tree_map(*args, **kwargs):
-        return jax.tree_map(
+    def _tx_tree.map(*args, **kwargs):
+        return jax.tree.map(
             *args,
             is_leaf=lambda x: isinstance(x, optax.GradientTransformation),
             **kwargs,
@@ -129,7 +129,7 @@ class JaxRLTrainState(struct.PyTreeNode):
 
             new_target_params = tau * params + (1 - tau) * target_params
         """
-        new_target_params = jax.tree_map(
+        new_target_params = jax.tree.map(
             lambda p, tp: p * tau + tp * (1 - tau), self.params, self.target_params
         )
         return self.replace(target_params=new_target_params)
@@ -140,26 +140,26 @@ class JaxRLTrainState(struct.PyTreeNode):
         `self.txs` as a tree prefix (i.e. where `self.txs` has a leaf, `grads`
         has a subtree with the same structure as `self.params`.)
         """
-        updates_and_new_states = self._tx_tree_map(
+        updates_and_new_states = self._tx_tree.map(
             lambda tx, opt_state, grad: tx.update(grad, opt_state, self.params),
             self.txs,
             self.opt_states,
             grads,
         )
-        updates = self._tx_tree_map(lambda _, x: x[0], self.txs, updates_and_new_states)
-        new_opt_states = self._tx_tree_map(
+        updates = self._tx_tree.map(lambda _, x: x[0], self.txs, updates_and_new_states)
+        new_opt_states = self._tx_tree.map(
             lambda _, x: x[1], self.txs, updates_and_new_states
         )
 
         # not the cleanest, I know, but this flattens the leaves of `updates`
         # into a list where leaves are defined by `self.txs`
         updates_flat = []
-        self._tx_tree_map(
+        self._tx_tree.map(
             lambda _, update: updates_flat.append(update), self.txs, updates
         )
 
         # apply all the updates additively
-        updates_acc = jax.tree_map(
+        updates_acc = jax.tree.map(
             lambda *xs: jnp.sum(jnp.array(xs), axis=0), *updates_flat
         )
         new_params = optax.apply_updates(self.params, updates_acc)
@@ -201,7 +201,7 @@ class JaxRLTrainState(struct.PyTreeNode):
         rngs = jax.tree_util.tree_unflatten(treedef, rngs)
 
         # compute gradients
-        grads_and_aux = jax.tree_map(
+        grads_and_aux = jax.tree.map(
             lambda loss_fn, rng: jax.grad(loss_fn, has_aux=has_aux)(self.params, rng),
             loss_fns,
             rngs,
@@ -215,8 +215,8 @@ class JaxRLTrainState(struct.PyTreeNode):
             grads_and_aux = jax.lax.pmean(grads_and_aux, axis_name=pmap_axis)
 
         if has_aux:
-            grads = jax.tree_map(lambda _, x: x[0], loss_fns, grads_and_aux)
-            aux = jax.tree_map(lambda _, x: x[1], loss_fns, grads_and_aux)
+            grads = jax.tree.map(lambda _, x: x[0], loss_fns, grads_and_aux)
+            aux = jax.tree.map(lambda _, x: x[1], loss_fns, grads_and_aux)
             return self.apply_gradients(grads=grads), aux
         else:
             return self.apply_gradients(grads=grads_and_aux)
@@ -241,7 +241,7 @@ class JaxRLTrainState(struct.PyTreeNode):
             params=params,
             target_params=target_params,
             txs=txs,
-            opt_states=cls._tx_tree_map(lambda tx: tx.init(params), txs),
+            opt_states=cls._tx_tree.map(lambda tx: tx.init(params), txs),
             rng=rng,
             epsilon=epsilon,
         )

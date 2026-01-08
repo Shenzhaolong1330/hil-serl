@@ -3,7 +3,7 @@ import jax
 
 @jax.jit
 def batch_to_jax(batch):
-    return jax.tree_util.tree_map(jax.device_put, batch)
+    return jax.tree_util.tree.map(jax.device_put, batch)
 
 
 class JaxRNG(object):
