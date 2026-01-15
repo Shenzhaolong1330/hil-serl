@@ -46,9 +46,9 @@ bash serl_robot_infra/robot_servers/launch_right_server.sh
 7. 要训练奖励分类器，导航到此任务的实验文件夹并运行：
     ```bash
     cd experiments/ram_insertion
-    python ../../train_reward_classifier.py --exp_name ram_insertion
+    python ../../train_reward_classifier.py --exp_name charger_insertion
     ```
-   奖励分类器将在训练配置中指定的分类器键对应的摄像头图像上进行训练。训练好的分类器将保存到`experiments/ram_insertion/classifier_ckpt`文件夹。
+   奖励分类器将在训练配置中指定的分类器键对应的摄像头图像上进行训练。训练好的分类器将保存到`experiments/charger_insertion/classifier_ckpt`文件夹。
 
 #### 记录演示
 少量的人类演示对于加速强化学习过程至关重要，对于此任务，我们使用20个演示。

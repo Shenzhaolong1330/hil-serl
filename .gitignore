@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 *.so
 *.pyc
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
 
 # 包构建文件
 *.egg-info/
