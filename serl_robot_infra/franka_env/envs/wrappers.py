@@ -224,6 +224,7 @@ class SpacemouseIntervention(gym.ActionWrapper):
         - action: spacemouse action if nonezero; else, policy action
         """
         expert_a, buttons = self.expert.get_action()
+        expert_a = expert_a * np.array([-1, -1, 1, -1, -1, 1])
         self.left, self.right = tuple(buttons)
         intervened = False
         
