@@ -16,82 +16,105 @@ from serl_launcher.wrappers.chunking import ChunkingWrapper
 from serl_launcher.networks.reward_classifier import load_classifier_func
 
 from experiments.config import DefaultTrainingConfig
-from experiments.ram_insertion.wrapper import RAMEnv
+from experiments.charger_insertion.wrapper import ChargerInsertionEnv
 
 class EnvConfig(DefaultEnvConfig):
-    SERVER_URL = "http://192.168.1.104:5000/"
+    SERVER_URL = "http://192.168.1.109:5000/"
     REALSENSE_CAMERAS = {
-        "wrist_1": {
-            "serial_number": "127122270146",
+        "wrist": {
+            "serial_number": "344322074412",
             "dim": (1280, 720),
             "exposure": 40000,
         },
-        "wrist_2": {
-            "serial_number": "127122270350",
+        "side": {
+            "serial_number": "243322071821",
             "dim": (1280, 720),
             "exposure": 40000,
         },
     }
+    # 图像裁剪区域，需要根据任务定制
     IMAGE_CROP = {
-        "wrist_1": lambda img: img[150:450, 350:1100],
-        "wrist_2": lambda img: img[100:500, 400:900],
+        "wrist": lambda img: img[100:600, 450:1150],
+        "side": lambda img: img[100:400, 550:850],
     }
-    TARGET_POSE = np.array([0.5881241235410154,-0.03578590131997776,0.27843494179085326, np.pi, 0, 0])
-    GRASP_POSE = np.array([0.5857508505445138,-0.22036261105675414,0.2731021902359492, np.pi, 0, 0])
-    RESET_POSE = TARGET_POSE + np.array([0, 0, 0.05, 0, 0.05, 0])
-    ABS_POSE_LIMIT_LOW = TARGET_POSE - np.array([0.03, 0.02, 0.01, 0.01, 0.1, 0.4])
-    ABS_POSE_LIMIT_HIGH = TARGET_POSE + np.array([0.03, 0.02, 0.05, 0.01, 0.1, 0.4])
+    # 任务完成时的位置，需要根据任务定制
+    TARGET_POSE = np.array([0.3498639707678422,-0.05041992649257111,0.04891253134873383,-3.1218946044069,0.02719812385453979,1.5095476646917074])
+    # 任务开始抓取物体的位置，需要根据任务定制
+    GRASP_POSE = np.array([[0.3698639707678422,-0.06041992649257111,0.08891253134873383,-3.1218946044069,0.02719812385453979,1.5095476646917074]])
+    # 重置位置，需要根据任务定制
+    RESET_POSE = TARGET_POSE + np.array([0, 0, 0.07, 0, 0.05, 0])
+    # 安全框，需要根据任务定制
+    ABS_POSE_LIMIT_LOW = TARGET_POSE - np.array([0.5, 0.5, 0.5, 0.1, 0.1, 0.4])
+    ABS_POSE_LIMIT_HIGH = TARGET_POSE + np.array([0.5, 0.5, 0.5, 0.1, 0.1, 0.4])
     RANDOM_RESET = True
     RANDOM_XY_RANGE = 0.02
     RANDOM_RZ_RANGE = 0.05
-    ACTION_SCALE = (0.01, 0.06, 1)
+    ACTION_SCALE = (0.03, 0.1, 1)
     DISPLAY_IMAGE = True
     MAX_EPISODE_LENGTH = 100
+
     COMPLIANCE_PARAM = {
-        "translational_stiffness": 2000,
+        # "translational_stiffness": 2000,
+        # "translational_damping": 89,
+        # "rotational_stiffness": 150,
+        # "rotational_damping": 7,
+        # "translational_Ki": 0.05,
+        # "translational_clip_x": 0.0075,
+        # "translational_clip_y": 0.0075,
+        # "translational_clip_z": 0.005,
+        # "translational_clip_neg_x": 0.0075,
+        # "translational_clip_neg_y": 0.0075,
+        # "translational_clip_neg_z": 0.005,
+        # "rotational_clip_x": 1.0,
+        # "rotational_clip_y": 1.0,
+        # "rotational_clip_z": 1.0,
+        # "rotational_clip_neg_x": 1.0,
+        # "rotational_clip_neg_y": 1.0,
+        # "rotational_clip_neg_z": 1.0,
+        # "rotational_Ki": 0.05,
+        "translational_stiffness": 2200,
         "translational_damping": 89,
-        "rotational_stiffness": 150,
-        "rotational_damping": 7,
-        "translational_Ki": 0,
-        "translational_clip_x": 0.0075,
-        "translational_clip_y": 0.0016,
-        "translational_clip_z": 0.0055,
-        "translational_clip_neg_x": 0.002,
-        "translational_clip_neg_y": 0.0016,
-        "translational_clip_neg_z": 0.005,
-        "rotational_clip_x": 0.01,
-        "rotational_clip_y": 0.025,
-        "rotational_clip_z": 0.005,
-        "rotational_clip_neg_x": 0.01,
-        "rotational_clip_neg_y": 0.025,
-        "rotational_clip_neg_z": 0.005,
-        "rotational_Ki": 0,
+        "rotational_stiffness": 260,
+        "rotational_damping": 9,
+        "translational_Ki": 0.05,
+        "translational_clip_x": 0.01,
+        "translational_clip_y": 0.01,
+        "translational_clip_z": 0.01,
+        "translational_clip_neg_x": 0.01,
+        "translational_clip_neg_y": 0.01,
+        "translational_clip_neg_z": 0.01,
+        "rotational_clip_x": 0.05,
+        "rotational_clip_y": 0.05,
+        "rotational_clip_z": 0.05,
+        "rotational_clip_neg_x": 0.05,
+        "rotational_clip_neg_y": 0.05,
+        "rotational_clip_neg_z": 0.05,
+        "rotational_Ki": 0.05,
     }
     PRECISION_PARAM = {
         "translational_stiffness": 2000,
         "translational_damping": 89,
-        "rotational_stiffness": 250,
-        "rotational_damping": 9,
+        "rotational_stiffness": 150,
+        "rotational_damping": 7,
         "translational_Ki": 0.0,
-        "translational_clip_x": 0.1,
-        "translational_clip_y": 0.1,
-        "translational_clip_z": 0.1,
-        "translational_clip_neg_x": 0.1,
-        "translational_clip_neg_y": 0.1,
-        "translational_clip_neg_z": 0.1,
-        "rotational_clip_x": 0.5,
-        "rotational_clip_y": 0.5,
-        "rotational_clip_z": 0.5,
-        "rotational_clip_neg_x": 0.5,
-        "rotational_clip_neg_y": 0.5,
-        "rotational_clip_neg_z": 0.5,
+        "translational_clip_x": 0.01,
+        "translational_clip_y": 0.01,
+        "translational_clip_z": 0.01,
+        "translational_clip_neg_x": 0.01,
+        "translational_clip_neg_y": 0.01,
+        "translational_clip_neg_z": 0.01,
+        "rotational_clip_x": 0.03,
+        "rotational_clip_y": 0.03,
+        "rotational_clip_z": 0.03,
+        "rotational_clip_neg_x": 0.03,
+        "rotational_clip_neg_y": 0.03,
+        "rotational_clip_neg_z": 0.03,
         "rotational_Ki": 0.0,
     }
 
-
 class TrainConfig(DefaultTrainingConfig):
-    image_keys = ["wrist_1", "wrist_2"]
-    classifier_keys = ["wrist_1", "wrist_2"]
+    image_keys = ["wrist", "side"]
+    classifier_keys = ["wrist", "side"]
     proprio_keys = ["tcp_pose", "tcp_vel", "tcp_force", "tcp_torque", "gripper_pose"]
     buffer_period = 1000
     checkpoint_period = 5000
@@ -100,7 +123,7 @@ class TrainConfig(DefaultTrainingConfig):
     setup_mode = "single-arm-fixed-gripper"
 
     def get_environment(self, fake_env=False, save_video=False, classifier=False):
-        env = RAMEnv(
+        env = ChargerInsertionEnv(
             fake_env=fake_env,
             save_video=save_video,
             config=EnvConfig(),

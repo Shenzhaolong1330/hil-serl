@@ -8,7 +8,7 @@ from pynput import keyboard
 
 from franka_env.envs.franka_env import FrankaEnv
 
-class RAMEnv(FrankaEnv):
+class ChargerInsertionEnv(FrankaEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.should_regrasp = False
@@ -80,7 +80,7 @@ class RAMEnv(FrankaEnv):
 
         input("Press enter to release gripper...")
         self._send_gripper_command(1.0)
-        input("Place RAM in holder and press enter to grasp...")
+        input("Place Charger in power strip and press enter to grasp...")
         top_pose = self.config.GRASP_POSE.copy()
         top_pose[2] += 0.05
         top_pose[0] += np.random.uniform(-0.005, 0.005)
