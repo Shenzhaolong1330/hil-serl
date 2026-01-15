@@ -211,11 +211,9 @@ class FrankaEnv(gym.Env):
         start_time = time.time()
         action = np.clip(action, self.action_space.low, self.action_space.high)
         xyz_delta = action[:3]
-
         self.nextpos = self.currpos.copy()
         self.nextpos[:3] = self.nextpos[:3] + xyz_delta * self.action_scale[0]
 
-        # GET ORIENTATION FROM ACTION
         self.nextpos[3:] = (
             Rotation.from_rotvec(action[3:6] * self.action_scale[1])
             * Rotation.from_quat(self.currpos[3:])
@@ -224,7 +222,8 @@ class FrankaEnv(gym.Env):
         gripper_action = action[6] * self.action_scale[2]
 
         self._send_gripper_command(gripper_action)
-        self._send_pos_command(self.clip_safety_box(self.nextpos))
+        # self._send_pos_command(self.clip_safety_box(self.nextpos))
+        self._send_pos_command(self.nextpos)
 
         self.curr_path_length += 1
         dt = time.time() - start_time
