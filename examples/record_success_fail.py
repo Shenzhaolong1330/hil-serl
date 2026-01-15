@@ -65,15 +65,15 @@ def main(_):
         if done or truncated:
             obs, _ = env.reset()
 
-    if not os.path.exists("./classifier_data"):
-        os.makedirs("./classifier_data")
+    if not os.path.exists(f"./experiments/{FLAGS.exp_name}/classifier_data"):
+        os.makedirs(f"./experiments/{FLAGS.exp_name}/classifier_data")
     uuid = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    file_name = f"./classifier_data/{FLAGS.exp_name}_{success_needed}_success_images_{uuid}.pkl"
+    file_name = f"./experiments/{FLAGS.exp_name}/classifier_data/{FLAGS.exp_name}_{success_needed}_success_images_{uuid}.pkl"
     with open(file_name, "wb") as f:
         pkl.dump(successes, f)
         print(f"saved {success_needed} successful transitions to {file_name}")
 
-    file_name = f"./classifier_data/{FLAGS.exp_name}_failure_images_{uuid}.pkl"
+    file_name = f"./experiments/{FLAGS.exp_name}/classifier_data/{FLAGS.exp_name}_failure_images_{uuid}.pkl"
     with open(file_name, "wb") as f:
         pkl.dump(failures, f)
         print(f"saved {len(failures)} failure transitions to {file_name}")
