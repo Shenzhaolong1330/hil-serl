@@ -44,8 +44,8 @@ class EnvConfig(DefaultEnvConfig):
     # 重置位置，需要根据任务定制
     RESET_POSE = TARGET_POSE + np.array([0, 0, 0.07, 0, 0.05, 0])
     # 安全框，需要根据任务定制
-    ABS_POSE_LIMIT_LOW = TARGET_POSE - np.array([0.5, 0.5, 0.5, 0.1, 0.1, 0.4])
-    ABS_POSE_LIMIT_HIGH = TARGET_POSE + np.array([0.5, 0.5, 0.5, 0.1, 0.1, 0.4])
+    ABS_POSE_LIMIT_LOW = TARGET_POSE - np.array([0.1, 0.1, 0.0, 0.1, 0.1, 0.4])
+    ABS_POSE_LIMIT_HIGH = TARGET_POSE + np.array([0.1, 0.1, 0.3, 0.1, 0.1, 0.4])
     RANDOM_RESET = True
     RANDOM_XY_RANGE = 0.02
     RANDOM_RZ_RANGE = 0.05

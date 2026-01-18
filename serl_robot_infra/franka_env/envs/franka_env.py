@@ -224,7 +224,7 @@ class FrankaEnv(gym.Env):
         gripper_action = action[6] * self.action_scale[2]
 
         self._send_gripper_command(gripper_action)
-        # self._send_pos_command(self.clip_safety_box(self.nextpos))
+        self._send_pos_command(self.clip_safety_box(self.nextpos))
         self._send_pos_command(self.nextpos)
 
         self.curr_path_length += 1
