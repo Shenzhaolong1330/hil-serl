@@ -19,7 +19,7 @@ from experiments.config import DefaultTrainingConfig
 from experiments.charger_insertion.wrapper import ChargerInsertionEnv
 
 class EnvConfig(DefaultEnvConfig):
-    SERVER_URL = "http://192.168.1.109:5000/"
+    SERVER_URL = "http://192.168.110.15:5000/"
     REALSENSE_CAMERAS = {
         "wrist": {
             "serial_number": "344322074412",
@@ -34,13 +34,13 @@ class EnvConfig(DefaultEnvConfig):
     }
     # 图像裁剪区域，需要根据任务定制
     IMAGE_CROP = {
-        "wrist": lambda img: img[100:600, 450:1150],
-        "side": lambda img: img[100:400, 550:850],
+        "wrist": lambda img: img[150:600, 450:1150],
+        "side": lambda img: img[100:400, 400:850],
     }
     # 任务完成时的位置，需要根据任务定制
-    TARGET_POSE = np.array([0.3498639707678422,-0.05041992649257111,0.04891253134873383,-3.1218946044069,0.02719812385453979,1.5095476646917074])
+    TARGET_POSE = np.array([0.41069017934252483,-0.02949999833602605,0.048396183874899384,3.118876581253268,-0.03125725971178328,1.560604549287991])
     # 任务开始抓取物体的位置，需要根据任务定制
-    GRASP_POSE = np.array([[0.3698639707678422,-0.06041992649257111,0.08891253134873383,-3.1218946044069,0.02719812385453979,1.5095476646917074]])
+    GRASP_POSE = np.array([[0.41069017934252483,-0.02949999833602605,0.048396183874899384,3.118876581253268,-0.03125725971178328,1.560604549287991]])
     # 重置位置，需要根据任务定制
     RESET_POSE = TARGET_POSE + np.array([0, 0, 0.07, 0, 0.05, 0])
     # 安全框，需要根据任务定制
@@ -51,7 +51,7 @@ class EnvConfig(DefaultEnvConfig):
     RANDOM_RZ_RANGE = 0.05
     ACTION_SCALE = (0.03, 0.1, 1)
     DISPLAY_IMAGE = True
-    MAX_EPISODE_LENGTH = 100
+    MAX_EPISODE_LENGTH = 80
 
     COMPLIANCE_PARAM = {
         # "translational_stiffness": 2000,
@@ -146,7 +146,10 @@ class TrainConfig(DefaultTrainingConfig):
             def reward_func(obs):
                 sigmoid = lambda x: 1 / (1 + jnp.exp(-x))
                 # added check for z position to further robustify classifier, but should work without as well
-                return int(sigmoid(classifier(obs)) > 0.85 and obs['state'][0, 6] > 0.04)
+                classifier_output = classifier(obs)
+                # 提取标量值：使用.item()或索引[0]来获取标量
+                classifier_prob = sigmoid(classifier_output).item() if hasattr(classifier_output, 'item') else sigmoid(classifier_output)[0]
+                return int(classifier_prob > 0.85 and obs['state'][0, 6] > 0.04)
 
             env = MultiCameraBinaryRewardClassifierWrapper(env, reward_func)
         return env

@@ -26,7 +26,7 @@ bash serl_robot_infra/robot_servers/launch_right_server.sh
 
 5. 最后，我们需要为训练过程收集一些位姿。对于此任务，`TARGET_POSE`指的是将RAM条完全插入主板时的臂部位姿，`GRASP_POSE`指的是抓取放置在支架上的RAM条时的臂部位姿，`RESET_POSE`指的是重置时的臂部位姿。`ABS_POSE_LIMIT_HIGH`和`ABS_POSE_LIMIT_LOW`决定了策略的边界框。我们启用了`RANDOM_RESET`，意味着每次重置时都会在`RESET_POSE`周围进行随机化（`RANDOM_XY_RANGE`和`RANDOM_RZ_RANGE`控制随机化程度）。您应该重新收集`TARGET_POSE`、`GRASP_POSE`，并确保边界框设置为安全探索。要收集Franka臂的当前位置，您可以运行：
     ```bash
-    curl -X POST http://<FRANKA_SERVER_URL>:5000/getpos_euler
+    curl -X POST http://192.168.110.15:5000/getpos_euler
     ```
 
 #### 训练奖励分类器
@@ -45,7 +45,7 @@ bash serl_robot_infra/robot_servers/launch_right_server.sh
 
 7. 要训练奖励分类器，导航到此任务的实验文件夹并运行：
     ```bash
-    cd experiments/ram_insertion
+    cd examples/experiments/charger_insertion
     python ../../train_reward_classifier.py --exp_name charger_insertion
     ```
    奖励分类器将在训练配置中指定的分类器键对应的摄像头图像上进行训练。训练好的分类器将保存到`experiments/charger_insertion/classifier_ckpt`文件夹。
@@ -55,9 +55,9 @@ bash serl_robot_infra/robot_servers/launch_right_server.sh
 
 8. 要使用spacemouse记录20个演示，请运行：
     ```bash
-    python ../../record_demos.py --exp_name ram_insertion --successes_needed 20
+    python ../../record_demos.py --exp_name charger_insertion --successes_needed 20
     ```
-   一旦情节被奖励分类器判定为成功或情节超时，机器人将重置。脚本将在收集到20个成功演示后终止，这些演示将保存到`experiments/ram_insertion/demo_data`文件夹。
+   一旦情节被奖励分类器判定为成功或情节超时，机器人将重置。脚本将在收集到20个成功演示后终止，这些演示将保存到`experiments/ charger_insertion/demo_data`文件夹。
 
      > **提示**：在演示数据收集过程中，您可能会注意到奖励分类器输出假阳性（情节终止时给予奖励但没有成功插入）或假阴性（尽管成功插入但没有给予奖励）。在这种情况下，您应该收集额外的分类器数据以针对观察到的分类器故障模式（例如，如果分类器对在空中持有RAM条给出假阳性，您应该收集更多该情况的负数据）。或者，您也可以调整奖励分类器阈值，尽管我们强烈建议在这样做之前收集额外的分类器数据（或者如果需要，添加更多分类器摄像头/图像）。
 
